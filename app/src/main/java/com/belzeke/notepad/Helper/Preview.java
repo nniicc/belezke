@@ -123,7 +123,6 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
      * This is called immediately after the surface is first created
      * @param holder
      */
-
     public void surfaceCreated(SurfaceHolder holder) {
         try {
             if(mCamera != null) {
