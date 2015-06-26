@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="noteColor">#FAC633</color>
+    <color name="noteColorDark">#f4b606</color>
+    <color name="photoColor">#8BC34A</color>
+    <color name="photoColorDark">#689F38</color>
+    <color name="videoColor">#3F51B5</color>
+    <color name="videoColorDark">#303F9F</color>
+    <color name="audioColor">#F44336</color>
+    <color name="audioColorDark">#D32F2F</color>
+    <color name="centerColor">#1C274E</color>
+
+    <color name="mainScreenColor">#000000</color>
+    <color name="mainScreenColorDark">#000000</color>
+
+    <color name="profilePicBackgroundColor">#FCBF29</color>
+    <color name="profileBottomBackgroundColor">#4A4A4A</color>
+
+    <color name="mainScreenArchiveBorderColor">#212121</color>
+    <color name="progressBarColor">#33B5E5</color>
+
+    <color name="bg_login">#26ae90</color>
+    <color name="bg_register">#2e3237</color>
+    <color name="bg_main">#428bca</color>
+    <color name="white">#ffffff</color>
+    <color name="input_login">#222222</color>
+    <color name="input_login_hint">#999999</color>
+    <color name="input_register">#888888</color>
+    <color name="input_register_bg">#3b4148</color>
+    <color name="input_register_hint">#5e6266</color>
+    <color name="btn_login">#26ae90</color>
+    <color name="btn_login_bg">#eceef1</color>
+    <color name="lbl_name">#333333</color>
+    <color name="btn_logut_bg">#ff6861</color>
+
+    <color name="primaryColor">#2196F3</color>
+    <color name="primaryColorDark">#1976D2</color>
+    <color name="accentColor">#FF007F</color>
+
+</resources>

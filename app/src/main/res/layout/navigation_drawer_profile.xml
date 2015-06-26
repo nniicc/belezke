@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.4"
+        android:background="@color/profilePicBackgroundColor">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_picture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="40dp"
+            android:layout_centerHorizontal="true"
+            app:border_width="2dp"
+            app:border_color="#FF000000"
+            android:src="#ff35a4ff"/>
+
+        <TextView
+            android:id="@+id/profile_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/profile_picture"
+            android:layout_centerHorizontal="true"
+            android:text="Marko Kuhar"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/profile_username"
+            android:layout_centerHorizontal="true"
+            android:text="marko.nniicc@gmail.com" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6"
+        android:background="@color/profileBottomBackgroundColor">
+
+        <Button
+            android:id="@+id/profile_button_followers"
+            style="@style/Base.TextAppearance.AppCompat"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/profile_button_maring_top_bottom"
+            android:layout_marginEnd="@dimen/profile_button_maring_left_right"
+            android:layout_marginLeft="@dimen/profile_button_maring_left_right"
+            android:layout_marginRight="@dimen/profile_button_maring_left_right"
+            android:layout_marginStart="@dimen/profile_button_maring_left_right"
+            android:layout_marginTop="@dimen/profile_button_maring_top_bottom"
+            android:text="@string/profile_button_followers"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/profile_button_password"
+            android:layout_below="@+id/profile_button_followers"
+            style="@style/Base.TextAppearance.AppCompat"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/profile_button_maring_top_bottom"
+            android:layout_marginEnd="@dimen/profile_button_maring_left_right"
+            android:layout_marginLeft="@dimen/profile_button_maring_left_right"
+            android:layout_marginRight="@dimen/profile_button_maring_left_right"
+            android:layout_marginStart="@dimen/profile_button_maring_left_right"
+            android:layout_marginTop="@dimen/profile_button_maring_top_bottom"
+            android:text="@string/profile_button_password"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/profile_button_more_space"
+            android:layout_below="@+id/profile_button_password"
+            style="@style/Base.TextAppearance.AppCompat"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/profile_button_maring_top_bottom"
+            android:layout_marginEnd="@dimen/profile_button_maring_left_right"
+            android:layout_marginLeft="@dimen/profile_button_maring_left_right"
+            android:layout_marginRight="@dimen/profile_button_maring_left_right"
+            android:layout_marginStart="@dimen/profile_button_maring_left_right"
+            android:layout_marginTop="@dimen/profile_button_maring_top_bottom"
+            android:text="@string/profile_button_more_space"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/profile_button_log_out"
+            android:layout_below="@id/profile_button_more_space"
+            style="@style/Base.TextAppearance.AppCompat"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/profile_button_maring_top_bottom"
+            android:layout_marginEnd="@dimen/profile_button_maring_left_right"
+            android:layout_marginLeft="@dimen/profile_button_maring_left_right"
+            android:layout_marginRight="@dimen/profile_button_maring_left_right"
+            android:layout_marginStart="@dimen/profile_button_maring_left_right"
+            android:layout_marginTop="@dimen/profile_button_maring_top_bottom"
+            android:text="@string/profile_button_log_out"
+            android:textColor="@android:color/white" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/Search"
+        android:title="@string/search"
+        appcompat:actionViewClass="android.support.v7.widget.SearchView"
+        appcompat:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/delete"
+        android:title="Delete"
+        appcompat:showAsAction="never"/>
+</menu>

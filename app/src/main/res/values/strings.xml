@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BElezke</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_notes">No notes</string>
+    <string name="menu_insert">Add Item</string>
+    <string name="note">New note</string>
+    <string name="search">Search</string>
+    <string name="deleteRow">Delete current note</string>
+    <string name="note_text">Text</string>
+    <string name="video_text">Video</string>
+    <string name="photo_text">Photo</string>
+    <string name="audio_text">Audio</string>
+    <string name="no_connection">There is no internet connection at the momment, please try again!</string>
+
+    <string name="cannot_create_file">Failed to create directory</string>
+    <string name="title_activity_grid_view">GridViewActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+
+
+    <string name="text_hashtag">Here is my #hash</string>
+    <string name="dont_forget_your_hastag">#don\'t forget your hash</string>
+
+
+
+    <string name="imageDescription_note">Note Image</string>
+    <string name="imageDescription_pic">Picture Image</string>
+    <string name="imageDescription_video">Video Image</string>
+    <string name="imageDescription_audio">Audio Image</string>
+    <string name="imageDescription_changeCamera">Change Camera Image</string>
+
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_password_confirm">Confirm Password</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="btn_register">REGISTER</string>
+    <string name="btn_link_to_register">Not a member? Sign up now.</string>
+    <string name="btn_link_to_login">Already registred! Login Me.</string>
+    <string name="welcome">Welcome</string>
+    <string name="btn_logout">LOGOUT</string>
+    <string name="title_activity_native">NativeActivity</string>
+    <string name="title_activity_video">VideoActivity</string>
+    <string name="title_activity_image_viewer">ImageViewerActivity</string>
+    <string name="local_service_started">1</string>
+    <string name="title_activity_list_view">ListViewActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_hash_tag_note">HashTagNoteActivity</string>
+    <string name="main_screen_archive">archive</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="profile_button_followers">what is going on with my followers?</string>
+    <string name="profile_button_password">What is my password?</string>
+    <string name="profile_button_more_space">need more space?</string>
+    <string name="profile_button_log_out">log out!</string>
+    <string name="drawer_open">open</string>
+    <string name="drawer_close">close</string>
+    <string name="title_activity_camera_test">s</string>
+
+</resources>

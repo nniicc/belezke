@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    tools:ignore="NestedWeights,UnusedAttribute">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar" />
+
+    <include
+        android:id="@+id/search_view"
+        layout="@layout/serach_results_view" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/main_screen_main_padding">
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/main_screen_between_padding">
+
+                <RelativeLayout
+                    android:id="@+id/note_button"
+                    android:layout_width="@dimen/main_screen_zero_dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/main_screen_zero_dp"
+                    android:layout_marginLeft="@dimen/main_screen_zero_dp"
+                    android:layout_marginRight="@dimen/main_screen_between_padding"
+                    android:layout_marginStart="@dimen/main_screen_between_padding"
+                    android:layout_weight="1.0"
+                    android:background="@drawable/background_note">
+
+                    <TextView
+                        android:id="@+id/note_archive"
+                        android:layout_width="75dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/background_archive"
+                        android:gravity="center"
+                        android:text="@string/main_screen_archive" />
+
+
+                    <TextView
+                        android:id="@+id/main_string_note_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/note_text"
+                        android:textStyle="bold" />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/photo_button"
+                    android:layout_width="@dimen/main_screen_zero_dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/main_screen_zero_dp"
+                    android:layout_marginLeft="@dimen/main_screen_between_padding"
+                    android:layout_marginRight="@dimen/main_screen_zero_dp"
+                    android:layout_marginStart="@dimen/main_screen_between_padding"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_pic"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/picture_archive"
+                        android:layout_width="75dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/background_archive"
+                        android:gravity="center"
+                        android:text="@string/main_screen_archive" />
+
+                    <TextView
+                        android:id="@+id/main_string_photo_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/photo_text"
+                        android:textStyle="bold" />
+
+                    <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                        android:id="@+id/photoProgress"
+                        android:layout_width="fill_parent"
+                        android:layout_height="10dp"
+                        android:layout_alignParentBottom="true"
+                        android:visibility="gone"
+                        app:rcBackgroundColor="@color/photoColor"
+                        app:rcBackgroundPadding="2dp"
+                        app:rcBackgroundRadius="3dp"
+                        app:rcMax="100"
+                        app:rcProgressColor="@color/progressBarColor" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/main_screen_between_padding">
+
+                <RelativeLayout
+                    android:id="@+id/audio_button"
+                    android:layout_width="@dimen/main_screen_zero_dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/main_screen_zero_dp"
+                    android:layout_marginLeft="@dimen/main_screen_zero_dp"
+                    android:layout_marginRight="@dimen/main_screen_between_padding"
+                    android:layout_marginStart="@dimen/main_screen_between_padding"
+                    android:layout_weight="1.0"
+                    android:background="@drawable/background_audio">
+
+                    <TextView
+                        android:id="@+id/audio_archive"
+                        android:layout_width="75dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/background_archive"
+                        android:gravity="center"
+                        android:text="@string/main_screen_archive" />
+
+
+                    <TextView
+                        android:id="@+id/audio_timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="40dp"
+                        android:textColor="#FFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/main_string_audio_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/audio_text"
+                        android:textStyle="bold" />
+
+                    <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                        android:id="@+id/audio_progress"
+                        android:layout_width="fill_parent"
+                        android:layout_height="10dp"
+                        android:layout_alignParentBottom="true"
+                        android:visibility="gone"
+                        app:rcBackgroundColor="@color/audioColor"
+                        app:rcBackgroundPadding="2dp"
+                        app:rcBackgroundRadius="3dp"
+                        app:rcMax="100"
+                        app:rcProgressColor="@color/progressBarColor" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/video_button"
+                    android:layout_width="@dimen/main_screen_zero_dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/main_screen_zero_dp"
+                    android:layout_marginLeft="@dimen/main_screen_between_padding"
+                    android:layout_marginRight="@dimen/main_screen_zero_dp"
+                    android:layout_marginStart="@dimen/main_screen_between_padding"
+                    android:layout_weight="1.0"
+                    android:background="@drawable/background_video">
+
+                    <TextView
+                        android:id="@+id/video_archive"
+                        android:layout_width="75dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/background_archive"
+                        android:gravity="center"
+                        android:text="@string/main_screen_archive" />
+
+                    <TextView
+                        android:id="@+id/main_string_video_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="20dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginRight="5dp"
+                        android:gravity="center"
+                        android:text="@string/video_text"
+                        android:textStyle="bold" />
+
+                    <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                        android:id="@+id/video_progress"
+                        android:layout_width="fill_parent"
+                        android:layout_height="10dp"
+                        android:layout_alignParentBottom="true"
+                        android:visibility="gone"
+                        app:rcBackgroundColor="@color/videoColor"
+                        app:rcBackgroundPadding="2dp"
+                        app:rcBackgroundRadius="3dp"
+                        app:rcMax="100"
+                        app:rcProgressColor="@color/progressBarColor" />
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <fragment
+            android:id="@+id/fragment_navigation_drawer"
+            android:name="com.belzeke.notepad.Helper.ProfileNavigationDrawerFragment"
+            android:layout_width="@dimen/nav_drawer_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:layout="@layout/navigation_drawer_profile"
+            tools:layout="@layout/navigation_drawer_profile" />
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

@@ -1,0 +1,44 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="app_bar_color">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
+    <style name="MainScreenTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_bar_color">@color/mainScreenColor</item>
+        <item name="colorPrimaryDark">@color/mainScreenColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
+    <style name="CustomToolbar" parent="ThemeOverlay.AppCompat">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+    </style>
+
+    <style name="PhotoTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_bar_color">@color/photoColor</item>
+        <item name="colorPrimaryDark">@color/photoColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
+    <style name="VideoTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_bar_color">@color/videoColor</item>
+        <item name="colorPrimaryDark">@color/primaryColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+
+    <style name="AudioTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_bar_color">@color/audioColor</item>
+        <item name="colorPrimaryDark">@color/audioColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+    <style name="TextTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="app_bar_color">@color/noteColor</item>
+        <item name="colorPrimaryDark">@color/noteColorDark</item>
+        <item name="colorAccent">@color/accentColor</item>
+    </style>
+</resources>
