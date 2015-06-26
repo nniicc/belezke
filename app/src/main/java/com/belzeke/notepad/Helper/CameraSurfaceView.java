@@ -41,8 +41,11 @@ public class CameraSurfaceView extends ViewGroup implements SurfaceHolder.Callba
 
         mSurfaceView = (SurfaceView) main.findViewById(R.id.videoPreview);
 */
-        mCamera = Camera.open();
         setCamera(mCamera);
+        mSurfaceView = new SurfaceView(context);
+
+        mCamera = Camera.open();
+        addView(mSurfaceView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);

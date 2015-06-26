@@ -69,6 +69,10 @@
             android:name=".Activities.CameraTestActivity"
             android:label="@string/title_activity_camera_test" >
         </activity>
+        <activity
+            android:name=".Activities.CameraPreview"
+            android:label="@string/title_activity_camera_prview" >
+        </activity>
     </application>
 
 </manifest>

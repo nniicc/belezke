@@ -57,5 +57,8 @@
     <string name="drawer_open">open</string>
     <string name="drawer_close">close</string>
     <string name="title_activity_camera_test">s</string>
+    <string name="title_activity_camera_prview">CameraPrview</string>
+    <string name="switch_cam">Change camera</string>
+    <string name="take_picture">Take picture</string>
 
 </resources>
