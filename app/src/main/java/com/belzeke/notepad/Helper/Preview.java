@@ -1,8 +1,5 @@
 package com.belzeke.notepad.Helper;
 
-/**
- * Created by marko on 26.6.2015.
- */
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -72,11 +69,8 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         } catch (IOException exception) {
             Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
         }
+        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
         requestLayout();
-        Camera.Parameters parameters = camera.getParameters();
-        parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-
-        camera.setParameters(parameters);
     }
 
 
@@ -146,15 +140,13 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
 
-        int targetHeight = h;
-
         // Try to find an size match aspect ratio and size
         for (Size size : sizes) {
             double ratio = (double) size.width / size.height;
             if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - targetHeight) < minDiff) {
+            if (Math.abs(size.height - h) < minDiff) {
                 optimalSize = size;
-                minDiff = Math.abs(size.height - targetHeight);
+                minDiff = Math.abs(size.height - h);
             }
         }
 
@@ -162,9 +154,9 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         if (optimalSize == null) {
             minDiff = Double.MAX_VALUE;
             for (Size size : sizes) {
-                if (Math.abs(size.height - targetHeight) < minDiff) {
+                if (Math.abs(size.height - h) < minDiff) {
                     optimalSize = size;
-                    minDiff = Math.abs(size.height - targetHeight);
+                    minDiff = Math.abs(size.height - h);
                 }
             }
         }
