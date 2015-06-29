@@ -9,7 +9,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,24 +29,12 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         this.setLayoutParams(lp);
 
-        RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setLayoutParams(lp);
-
 
         mSurfaceView = new SurfaceView(context);
         mSurfaceView.setLayoutParams(lp);
         mSurfaceView.bringToFront();
-        relativeLayout.addView(mSurfaceView);
 
-      /*  Button mainButton = new Button(context);
-        mainButton.setText("Start/Stop");
-        RelativeLayout.LayoutParams mainButtonLp = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        mainButtonLp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        mainButton.setLayoutParams(mainButtonLp);
-
-        relativeLayout.addView(mainButton);
-*/
-        addView(relativeLayout);
+        addView(mSurfaceView);
 
         mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
@@ -88,14 +75,10 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         if (changed && getChildCount() > 0) {
-            ViewGroup parent = (ViewGroup) getChildAt(0);
-            final View child = parent.getChildAt(0);
-
+            final View child = getChildAt(0);
 
             final int width = r - l;
             final int height = b - t;
-
-            parent.layout(0, 0, width, height);
             child.layout(0, 0, width, height);
         }
     }
