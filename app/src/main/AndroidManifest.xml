@@ -12,6 +12,7 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 
     <application
         android:name=".Config.AppController"
@@ -72,6 +73,10 @@
         <activity
             android:name=".Activities.CameraPreview"
             android:label="@string/title_activity_camera_prview" >
+        </activity>
+        <activity
+            android:name=".Activities.CameraActivityLast"
+            android:label="@string/title_activity_camera_activity_last" >
         </activity>
     </application>
 

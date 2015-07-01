@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
-import com.belzeke.notepad.Activities.CameraPreview;
+import com.belzeke.notepad.Activities.CameraActivityLast;
 import com.belzeke.notepad.Config.AppConfig;
 
 /**
@@ -19,7 +19,7 @@ public class videoOnClickListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (!AppConfig.NavigationShown) {
-            Intent intent = new Intent(context, CameraPreview.class);
+            Intent intent = new Intent(context, CameraActivityLast.class);
             context.startActivityForResult(intent, AppConfig.VIDEO_REQUEST);
         }
     }

@@ -60,5 +60,7 @@
     <string name="title_activity_camera_prview">CameraPrview</string>
     <string name="switch_cam">Change camera</string>
     <string name="take_picture">Take picture</string>
+    <string name="title_activity_camera_activity_last">CameraActivityLast</string>
+    <string name="camera_focus">Camera Focus</string>
 
 </resources>

@@ -87,7 +87,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         setMeasuredDimension(width, height);
 
         if(mSupportedPreviewSizes != null){
-            mPreviewSize = CameraHelper.getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+            Camera.Size optimalSize = CameraHelper.getOptimalPreviewSize(720, 480, mSupportedPreviewSizes);
         }
     }
 
@@ -142,7 +142,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             Camera.Parameters parameters = camera.getParameters();
             List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            Camera.Size optimalSize = CameraHelper.getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
+            Camera.Size optimalSize = CameraHelper.getOptimalPreviewSize(720, 480, mSupportedPreviewSizes);
 
             parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
 

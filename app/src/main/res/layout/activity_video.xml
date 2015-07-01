@@ -1,15 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/videoScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
     android:keepScreenOn="true"
     tools:context="com.belzeke.notepad.Activities.VideoActivityBackupTest">
 
     <LinearLayout
         android:id="@+id/videoPreview"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
     </LinearLayout>
 
@@ -53,6 +55,16 @@
         android:visibility="gone" />
 
     <Button
+        android:id="@+id/flashMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="80dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        android:text="Off" />
+
+    <Button
         android:id="@+id/sendVid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,5 +76,13 @@
         android:layout_marginRight="10dp"
         android:text="Send"
         android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/cameraFocusCursor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/camera_focus"
+        android:src="@drawable/camera_focus"
+        android:visibility="invisible" />
 
 </RelativeLayout>
