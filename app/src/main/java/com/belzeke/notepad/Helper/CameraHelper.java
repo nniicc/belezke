@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.util.Log;
 
 import java.util.List;
 
@@ -49,6 +50,31 @@ public class CameraHelper {
             }
         }
         return cameraId;
+    }
+
+    public static Size getOptimalPreviewSize2(List<Camera.Size> sizes, int width, int height){
+        Camera.Size result = null;
+        double PREVIEW_SIZE_FACTOR = 1.30;
+        Log.i(CameraPreviewLast.class.getSimpleName(), "window width: " + width + ", height: " + height);
+        for (final Camera.Size size : sizes) {
+            if (size.width <= width * PREVIEW_SIZE_FACTOR && size.height <= height * PREVIEW_SIZE_FACTOR) {
+                if (result == null) {
+                    result = size;
+                } else {
+                    final int resultArea = result.width * result.height;
+                    final int newArea = size.width * size.height;
+
+                    if (newArea > resultArea) {
+                        result = size;
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            result = getOptimalPreviewSize(720, 480, sizes);
+        }
+        Log.i(Preview.class.getSimpleName(), "Using PreviewSize: " + result.width + " x " + result.height);
+        return result;
     }
 
     public static Size getOptimalPreviewSize(int width, int height, List<Camera.Size> sizes) {

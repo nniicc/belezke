@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -285,8 +287,45 @@ public class CameraActivityLast extends Activity {
             if (mCamera == null)
                 chooseCamera();
 
-            Camera.Parameters parameters = mCamera.getParameters();
+            Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            Camera.Size optimalSize = mPreview.getPreviewSize();
 
+            CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+            profile.videoFrameWidth = optimalSize.width;
+            profile.videoFrameHeight = optimalSize.height;
+            profile.videoBitRate = 1500000;
+            profile.videoCodec = MediaRecorder.VideoEncoder.H264;
+            profile.videoFrameRate = 30;
+            profile.audioBitRate = 780000;
+
+            Camera.Parameters parameters = mCamera.getParameters();
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                parameters.setAutoExposureLock(false);
+                parameters.setAutoWhiteBalanceLock(false);
+            }
+            if(!CameraHelper.cameraFront) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+            parameters.set("iso", "ISO800");
+            parameters.setColorEffect("none");
+            parameters.setPreviewFrameRate(30);
+            parameters.setExposureCompensation(4);
+            parameters.setSceneMode("scene-mode=dusk-dawn");
+
+            mCamera.setParameters(parameters);
+
+            mediaRecorder = new MediaRecorder();
+
+            mCamera.unlock();
+            mediaRecorder.setCamera(mCamera);
+
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
+
+            mediaRecorder.setProfile(profile);
+/*
+            Camera.Parameters parameters = mCamera.getParameters();
 
             parameters.set("iso", "ISO800");
             parameters.setColorEffect("none");
@@ -294,9 +333,7 @@ public class CameraActivityLast extends Activity {
             parameters.setExposureCompensation(4);
             parameters.setSceneMode("scene-mode=dusk-dawn");
 
-
             mCamera.setParameters(parameters);
-            Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
             mediaRecorder = new MediaRecorder();
 
@@ -317,7 +354,7 @@ public class CameraActivityLast extends Activity {
             mediaRecorder.setAudioEncodingBitRate(780000);
             mediaRecorder.setAudioSamplingRate(44100);
             mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
-
+*/
 
             if (display.getRotation() == Surface.ROTATION_0) {
                 if (!CameraHelper.cameraFront) {

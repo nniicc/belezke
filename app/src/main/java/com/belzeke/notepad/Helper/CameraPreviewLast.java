@@ -161,7 +161,7 @@ public class CameraPreviewLast extends SurfaceView implements SurfaceHolder.Call
         setMeasuredDimension(width, height);
 
         if (mSupportedPreviewSizes != null) {
-            mPreviewSize = CameraHelper.getOptimalPreviewSize(1024, 720, mSupportedPreviewSizes);
+            mPreviewSize = CameraHelper.getOptimalPreviewSize2(mSupportedPreviewSizes, width, height);
         }
     }
 
