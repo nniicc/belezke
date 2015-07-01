@@ -14,7 +14,7 @@ import java.util.List;
 public class CameraHelper {
 
     public static boolean cameraFront = false;
-    public static int cameraId;
+    public static int cameraId = -1;
 
     public static boolean hasCamera(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
@@ -70,5 +70,17 @@ public class CameraHelper {
         }
         return result;
 
+    }
+
+    public static boolean hasFrontCamera() {
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                return true;
+            }
+        }
+        return false;
     }
 }

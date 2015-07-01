@@ -13,6 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,7 +200,7 @@ public class CameraPreviewLast extends SurfaceView implements SurfaceHolder.Call
         }
     }
 
-    public void focus(MotionEvent event) {
+    public void focus(MotionEvent event, final ImageView focusCursor) {
         if (mCamera != null) {
             mCamera.cancelAutoFocus();
             Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
@@ -209,9 +210,9 @@ public class CameraPreviewLast extends SurfaceView implements SurfaceHolder.Call
                 parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             }
             if (parameters.getMaxNumFocusAreas() > 0) {
-                List<Camera.Area> mylist = new ArrayList<>();
-                mylist.add(new Camera.Area(focusRect, 1000));
-                parameters.setFocusAreas(mylist);
+                List<Camera.Area> myList = new ArrayList<>();
+                myList.add(new Camera.Area(focusRect, 1000));
+                parameters.setFocusAreas(myList);
             }
 
             try {
@@ -230,6 +231,7 @@ public class CameraPreviewLast extends SurfaceView implements SurfaceHolder.Call
                             camera.setParameters(parameters);
                             camera.startPreview();
                         }
+                        focusCursor.setVisibility(GONE);
                     }
                 });
             } catch (Exception e) {

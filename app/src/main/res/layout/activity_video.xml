@@ -64,6 +64,18 @@
         android:layout_marginStart="30dp"
         android:text="Off" />
 
+
+    <EditText
+        android:id="@+id/videoHashTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:background="@color/editTextBackgroudColor"
+        android:hint="@string/dont_forget_your_hashtag"
+        android:inputType="textAutoComplete"
+        android:visibility="gone" />
+
     <Button
         android:id="@+id/sendVid"
         android:layout_width="wrap_content"

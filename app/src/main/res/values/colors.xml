@@ -9,6 +9,7 @@
     <color name="audioColor">#F44336</color>
     <color name="audioColorDark">#D32F2F</color>
     <color name="centerColor">#1C274E</color>
+    <color name="editTextBackgroudColor">#787878</color>
 
     <color name="mainScreenColor">#000000</color>
     <color name="mainScreenColorDark">#000000</color>

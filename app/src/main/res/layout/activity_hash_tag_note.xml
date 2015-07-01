@@ -21,7 +21,7 @@
         android:layout_below="@+id/hashTagImg"
         android:gravity="center"
         android:id="@+id/hashTagText"
-        android:hint="@string/dont_forget_your_hastag"
+        android:hint="@string/dont_forget_your_hashtag"
         android:inputType="text"
         android:paddingEnd="20dp"
         android:paddingLeft="20dp"

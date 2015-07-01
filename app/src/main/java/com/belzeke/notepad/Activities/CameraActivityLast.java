@@ -18,7 +18,9 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -46,6 +48,7 @@ public class CameraActivityLast extends Activity {
 
     private LinearLayout cameraPreview;
     private boolean recording;
+    private boolean previewing;
     private MediaPlayer mediaPlayer;
     private MediaRecorder mediaRecorder;
     private Button backCameraButton;
@@ -55,6 +58,7 @@ public class CameraActivityLast extends Activity {
     private File outputFile;
     private long startTime = 0;
     private ImageView focusCursor;
+    private EditText hashTags;
 
 
     private TextView timer;
@@ -93,11 +97,15 @@ public class CameraActivityLast extends Activity {
             finish();
         }
         if (mCamera == null) {
-            if (CameraHelper.findFrontFacingCamera() < 0) {
+            if (!CameraHelper.hasFrontCamera()) {
                 Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
                 switchCamera.setVisibility(View.GONE);
             }
-            mCamera = Camera.open(CameraHelper.findBackFacingCamera());
+            if(cameraPreview == null || cameraPreview.getChildCount() == 0){
+                cameraPreview = (LinearLayout) findViewById(R.id.videoPreview);
+                cameraPreview.addView(mPreview);
+            }
+            mCamera = Camera.open(CameraHelper.cameraId == -1 ? CameraHelper.findBackFacingCamera() : CameraHelper.cameraId);
             mPreview.refreshCamera(mCamera);
         }
     }
@@ -107,6 +115,8 @@ public class CameraActivityLast extends Activity {
         screen.setOnTouchListener(touchFocusListener);
 
         focusCursor = (ImageView) findViewById(R.id.cameraFocusCursor);
+
+        hashTags = (EditText) findViewById(R.id.videoHashTag);
 
         cameraPreview = (LinearLayout) findViewById(R.id.videoPreview);
         mPreview = new CameraPreviewLast(mContext, mCamera);
@@ -136,11 +146,16 @@ public class CameraActivityLast extends Activity {
     }
 
     private void resetPosition(){
+        previewing = false;
         sendVideo.setVisibility(View.GONE);
         switchCamera.setVisibility(View.VISIBLE);
         backCameraButton.setVisibility(View.GONE);
         timer.setText("");
-        flashButton.setVisibility(View.VISIBLE);
+        hashTags.setVisibility(View.GONE);
+        if(CameraHelper.cameraFront)
+            flashButton.setVisibility(View.GONE);
+        else
+            flashButton.setVisibility(View.VISIBLE);
     }
 
     private void recordingPosition(){
@@ -148,67 +163,46 @@ public class CameraActivityLast extends Activity {
         switchCamera.setVisibility(View.GONE);
         backCameraButton.setVisibility(View.GONE);
         flashButton.setVisibility(View.GONE);
+        hashTags.setVisibility(View.GONE);
     }
     private void previewPosition(){
         sendVideo.setVisibility(View.VISIBLE);
         switchCamera.setVisibility(View.GONE);
         backCameraButton.setVisibility(View.VISIBLE);
         flashButton.setVisibility(View.GONE);
+        hashTags.setVisibility(View.VISIBLE);
     }
 
     View.OnTouchListener touchFocusListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            if(previewing){
+                InputMethodManager imm = (InputMethodManager)getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(hashTags.getWindowToken(), 0);
+            }
             if (!CameraHelper.cameraFront) {
-                mPreview.focus(event);
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        focusCursor.setVisibility(View.VISIBLE);
-                        RelativeLayout.LayoutParams mParams = (RelativeLayout.LayoutParams) focusCursor.getLayoutParams();
-                        int x = (int) event.getRawX();
-                        int y = (int) event.getRawY();
-                        mParams.leftMargin = x - (focusCursor.getWidth() / 2);
-                        mParams.topMargin = y - (focusCursor.getHeight() / 2);
-                        focusCursor.setLayoutParams(mParams);
-/*
-                        Animation show = new AlphaAnimation(0, 1f);
-                        show.setDuration(100);
-                        Animation scaleUp = new ScaleAnimation(0.5f, 1, 0.5f, 1);
-                        scaleUp.setDuration(500);
-                        Animation scaleDown = new ScaleAnimation(1, 0.5f, 1, 0.5f);
-                        scaleDown.setDuration(500);
-                        Animation hide = new AlphaAnimation(1f, 0);
-                        hide.setDuration(100);
+                if(!recording && !previewing) {
+                    mPreview.focus(event, focusCursor);
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            focusCursor.setVisibility(View.VISIBLE);
+                            RelativeLayout.LayoutParams mParams = (RelativeLayout.LayoutParams) focusCursor.getLayoutParams();
+                            int x = (int) event.getRawX();
+                            int y = (int) event.getRawY();
+                            mParams.leftMargin = x - (focusCursor.getWidth() / 2);
+                            mParams.topMargin = y - focusCursor.getHeight();
+                            focusCursor.setLayoutParams(mParams);
 
-                        AnimationSet animSet = new AnimationSet(true);
-                        animSet.setFillEnabled(true);
-                        animSet.addAnimation(show);
-                        animSet.addAnimation(scaleUp);
-                        animSet.addAnimation(scaleDown);
-                        animSet.addAnimation(hide);*/
 
-                        final Animation animation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-                        animation.setDuration(1200); // duration - half a second
-                        animation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-                        animation.setRepeatMode(Animation.REVERSE); // Reverse animation at the end so the button will fade back in
-                        focusCursor.startAnimation(animation);
-                        animation.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
+                            final Animation animation = new AlphaAnimation(1, 0);
+                            animation.setDuration(1200);
+                            animation.setInterpolator(new LinearInterpolator());
+                            animation.setRepeatMode(Animation.REVERSE);
+                            focusCursor.startAnimation(animation);
 
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-                                focusCursor.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        });
-                        break;
+                            break;
+                    }
                 }
             }
             return true;
@@ -247,6 +241,7 @@ public class CameraActivityLast extends Activity {
                     @Override
                     public void run() {
                         try {
+                            previewing = true;
                             mediaPlayer.setDisplay(mPreview.getHolder());
                             mediaPlayer.setDataSource(AppConfig.LastFilePathCreated);
                             mediaPlayer.setLooping(true);
@@ -363,6 +358,7 @@ public class CameraActivityLast extends Activity {
         public void onClick(View v) {
             Intent intent = new Intent();
             intent.putExtra("File", AppConfig.LastFilePathCreated);
+            intent.putExtra("HashTag", hashTags.getText());
             setResult(RESULT_OK, intent);
             finish();
         }
