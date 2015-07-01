@@ -46,9 +46,6 @@
             android:name=".Activities.RegisterActivity"
             android:label="@string/title_activity_register" />
         <activity
-            android:name=".Activities.VideoActivity"
-            android:label="@string/title_activity_video" />
-        <activity
             android:name=".Activities.ImageViewerActivity"
             android:label="@string/title_activity_image_viewer" >
         </activity>
@@ -67,7 +64,7 @@
             android:label="@string/title_activity_hash_tag_note" >
         </activity>
         <activity
-            android:name=".Activities.CameraActivityLast"
+            android:name=".Activities.VideoActivity"
             android:label="@string/title_activity_camera_activity_last" >
         </activity>
     </application>

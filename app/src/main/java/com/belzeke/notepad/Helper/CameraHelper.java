@@ -52,10 +52,10 @@ public class CameraHelper {
         return cameraId;
     }
 
-    public static Size getOptimalPreviewSize2(List<Camera.Size> sizes, int width, int height){
+    public static Size getOptimalPreviewSize2(List<Camera.Size> sizes, int width, int height) {
         Camera.Size result = null;
         double PREVIEW_SIZE_FACTOR = 1.30;
-        Log.i(CameraPreviewLast.class.getSimpleName(), "window width: " + width + ", height: " + height);
+        Log.i(CameraPreview.class.getSimpleName(), "window width: " + width + ", height: " + height);
         for (final Camera.Size size : sizes) {
             if (size.width <= width * PREVIEW_SIZE_FACTOR && size.height <= height * PREVIEW_SIZE_FACTOR) {
                 if (result == null) {
@@ -73,7 +73,7 @@ public class CameraHelper {
         if (result == null) {
             result = getOptimalPreviewSize(720, 480, sizes);
         }
-        Log.i(Preview.class.getSimpleName(), "Using PreviewSize: " + result.width + " x " + result.height);
+        Log.i(CameraPreview.class.getSimpleName(), "Using PreviewSize: " + result.width + " x " + result.height);
         return result;
     }
 
@@ -106,6 +106,18 @@ public class CameraHelper {
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isCameraUsedByOtherApp() {
+        Camera camera = null;
+        try {
+            camera = Camera.open();
+        } catch (RuntimeException e) {
+            return true;
+        } finally {
+            if (camera != null) camera.release();
         }
         return false;
     }

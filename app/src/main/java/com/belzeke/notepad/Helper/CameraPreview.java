@@ -1,196 +1,135 @@
 package com.belzeke.notepad.Helper;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.hardware.Camera;
-import android.media.MediaRecorder;
-import android.os.Build;
+import android.hardware.Camera.Parameters;
+import android.util.AttributeSet;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by marko on 6.5.2015.
+ * Created by marko on 1.7.2015.
  */
-
 @SuppressWarnings("deprecation")
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+
+    private static final int FOCUS_AREA_SIZE = 300;
     private SurfaceHolder mHolder;
     private Camera mCamera;
     private Context mContext;
-    private int width, height;
 
-    public MediaRecorder mediaRecorder;
-    private List<Camera.Size> mSupportedPreviewSizes;
-    private List<String> mSupportedFlashModes;
-    private Camera.Size mPreviewSize;
+    public static final int FLASH_MODE_OFF = 0;
+    public static final int FLASH_MODE_ON = 1;
 
+    public Camera.Size getPreviewSize() {
+        return mPreviewSize;
+    }
 
-    public CameraPreview(Context context, Camera mCamera) {
+    Camera.Size mPreviewSize;
+    List<Camera.Size> mSupportedPreviewSizes;
+
+    public CameraPreview(Context context, Camera camera) {
         super(context);
-        this.mContext = context;
-        this.mCamera = mCamera;
+        mContext = context;
+        mCamera = camera;
         mHolder = getHolder();
         mHolder.addCallback(this);
+        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
-    public SurfaceHolder getPrivateHolder() { return mHolder; }
+    public CameraPreview(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
+    public CameraPreview(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
 
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        try{
-            if(mCamera != null){
-                mHolder = holder;
-                mCamera.setPreviewDisplay(mHolder);
+        try {
+            if (mCamera != null) {
+                mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+                requestLayout();
+                setCameraParams();
+                mCamera.setPreviewDisplay(holder);
                 mCamera.startPreview();
             }
-        }catch (IOException e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void refreshCamera(Camera camera){
-        mCamera = camera;
-        if(mCamera != null){
-            mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
-            Camera.Parameters parameters = camera.getParameters();
-            parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
+    public void refreshCamera(Camera camera) {
+        if (mHolder.getSurface() == null) return;
 
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                parameters.setAutoExposureLock(false);
-                parameters.setAutoWhiteBalanceLock(false);
-            }
-            parameters.set("iso", "ISO800");
-            parameters.setColorEffect("none");
-            parameters.setPreviewFrameRate(30);
-            parameters.setExposureCompensation(4);
-            parameters.setSceneMode("scene-mode=dusk-dawn");
-            if(!CameraHelper.cameraFront) {
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-            }
-            camera.setParameters(parameters);
+        try {
+            mCamera.stopPreview();
+        } catch (Exception ignored) {
         }
-        requestLayout();
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-        setMeasuredDimension(width, height);
-
-        if(mSupportedPreviewSizes != null){
-            Camera.Size optimalSize = CameraHelper.getOptimalPreviewSize(720, 480, mSupportedPreviewSizes);
-        }
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if(changed){
-            final View cameraView = this;
-
-            int width = right - left;
-            int height = bottom - top;
-
-            int previewWidth = width;
-            int previewHeight = height;
-
-            if(mPreviewSize != null){
-                Display display = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
-                switch (display.getRotation()){
-                    case Surface.ROTATION_0:
-                        previewWidth = mPreviewSize.height;
-                        previewHeight = mPreviewSize.width;
-                        mCamera.setDisplayOrientation(90);
-                        break;
-                    case Surface.ROTATION_90:
-                        previewWidth = mPreviewSize.width;
-                        previewHeight = mPreviewSize.height;
-                        break;
-                    case Surface.ROTATION_180:
-                        previewWidth = mPreviewSize.height;
-                        previewHeight = mPreviewSize.width;
-                        break;
-                    case Surface.ROTATION_270:
-                        previewWidth = mPreviewSize.width;
-                        previewHeight = mPreviewSize.height;
-                        mCamera.setDisplayOrientation(180);
-                        break;
-                }
-            }
-
-            cameraView.layout(0, 0, previewWidth, previewHeight);
-            try{
+        setCamera(camera);
+        if (mCamera != null) {
+            try {
+                mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
+                requestLayout();
+                setCameraParams();
                 mCamera.setPreviewDisplay(mHolder);
                 mCamera.startPreview();
-            }catch (IOException e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void refreshCamera1(Camera camera){
-        if(mHolder == null) return;
-        try {
-            Camera.Parameters parameters = camera.getParameters();
-            List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            Camera.Size optimalSize = CameraHelper.getOptimalPreviewSize(720, 480, mSupportedPreviewSizes);
 
-            parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
-
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                parameters.setAutoExposureLock(false);
-                parameters.setAutoWhiteBalanceLock(false);
+    private boolean canUseFlash() {
+        if (mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            List<String> flashModes = mCamera.getParameters().getSupportedFlashModes();
+            if (flashModes != null) {
+                return true;
             }
-            parameters.set("iso", "ISO800");
-            parameters.setColorEffect("none");
-            parameters.setPreviewFrameRate(30);
-            parameters.setExposureCompensation(4);
-            parameters.setSceneMode("scene-mode=dusk-dawn");
-            if(!CameraHelper.cameraFront) {
-                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-            }
-
-            parameters.setPreviewSize(optimalSize.width, optimalSize.height);
-            camera.setParameters(parameters);
-        }catch (Exception e){
-            e.printStackTrace();
         }
-        try{
-            camera.stopPreview();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        Display display = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        if(display.getRotation() == Surface.ROTATION_0){
-            camera.setDisplayOrientation(90);
-        }
-        if(display.getRotation() == Surface.ROTATION_270){
-            camera.setDisplayOrientation(180);
-        }
-
-        setCamera(camera);
-        try{
-            camera.setPreviewDisplay(mHolder);
-            camera.startPreview();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        return false;
     }
 
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int w, int h) {
-        width = w;
-        height = h;
-        refreshCamera(mCamera);
+    private void setCameraParams() {
+        Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        if (display.getRotation() == Surface.ROTATION_0) {
+            if (!CameraHelper.cameraFront) {
+                mCamera.setDisplayOrientation(90);
+            } else {
+                mCamera.setDisplayOrientation(90);
+            }
+        }
+        if (display.getRotation() == Surface.ROTATION_270) {
+            if (!CameraHelper.cameraFront) {
+                mCamera.setDisplayOrientation(180);
+            } else {
+                mCamera.setDisplayOrientation(0);
+            }
+        }
+        Camera.Parameters parameters = mCamera.getParameters();
+
+
+        parameters.set("iso", "ISO800");
+        parameters.setColorEffect("none");
+        parameters.setPreviewFrameRate(30);
+        parameters.setExposureCompensation(4);
+        parameters.setSceneMode("scene-mode=dusk-dawn");
+
+        mCamera.setParameters(parameters);
     }
 
     private void setCamera(Camera camera) {
@@ -198,21 +137,127 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        refreshCamera(mCamera);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
         releaseCamera();
-        releaseMediaRecorder();
     }
-    public void releaseMediaRecorder(){
-        if(mediaRecorder != null){
-            mediaRecorder.reset();
-            mediaRecorder.release();
-            mediaRecorder = null;
-        }
-    }
-    public void releaseCamera(){
-        if(mCamera != null){
+
+    public void releaseCamera() {
+        if (mCamera != null) {
             mCamera.release();
             mCamera = null;
         }
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        setMeasuredDimension(width, height);
+
+        if (mSupportedPreviewSizes != null) {
+            mPreviewSize = CameraHelper.getOptimalPreviewSize2(mSupportedPreviewSizes, width, height);
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (changed) {
+
+            final int width = r - l;
+            final int height = b - t;
+            this.layout(0, 0, width, height);
+        }
+    }
+
+    public void flashOn() {
+        if (canUseFlash()) {
+            try {
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                mCamera.setParameters(parameters);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void flashOff() {
+        if (canUseFlash()) {
+            try {
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(parameters);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void focus(MotionEvent event, final ImageView focusCursor) {
+        if (mCamera != null) {
+            mCamera.cancelAutoFocus();
+            Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
+
+            Camera.Parameters parameters = mCamera.getParameters();
+            if (!parameters.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+            if (parameters.getMaxNumFocusAreas() > 0) {
+                List<Camera.Area> myList = new ArrayList<>();
+                myList.add(new Camera.Area(focusRect, 1000));
+                parameters.setFocusAreas(myList);
+            }
+
+            try {
+                mCamera.cancelAutoFocus();
+                mCamera.setParameters(parameters);
+                mCamera.startPreview();
+                mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                    @Override
+                    public void onAutoFocus(boolean success, Camera camera) {
+                        if (!camera.getParameters().getFocusMode().equals(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                            Parameters parameters = camera.getParameters();
+                            parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                            if (parameters.getMaxNumFocusAreas() > 0) {
+                                parameters.setFocusAreas(null);
+                            }
+                            camera.setParameters(parameters);
+                            camera.startPreview();
+                        }
+                        focusCursor.setVisibility(GONE);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Rect calculateTapArea(float x, float y, float v) {
+        int left = clamp(Float.valueOf((x / this.getWidth()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
+        int top = clamp(Float.valueOf((y / this.getHeight()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
+
+        return new Rect(left, top, left + FOCUS_AREA_SIZE, top + FOCUS_AREA_SIZE);
+    }
+
+    private int clamp(int touchCoordinateInCameraReper, int focusAreaSize) {
+        int result;
+        if (Math.abs(touchCoordinateInCameraReper) + focusAreaSize / 2 > 1000) {
+            if (touchCoordinateInCameraReper > 0) {
+                result = 1000 - focusAreaSize / 2;
+            } else {
+                result = -1000 + focusAreaSize / 2;
+            }
+        } else {
+            result = touchCoordinateInCameraReper - focusAreaSize / 2;
+        }
+        return result;
     }
 }

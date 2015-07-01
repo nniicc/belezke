@@ -3,6 +3,7 @@ package com.belzeke.notepad.Activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
@@ -12,12 +13,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,24 +36,38 @@ import com.belzeke.notepad.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class VideoActivity extends Activity{
+public class VideoActivity extends Activity {
+
+    private String TAG = VideoActivity.class.getSimpleName();
 
     private Camera mCamera;
     private CameraPreview mPreview;
-    private Button mainButton, switchCamera, backCameraButton, sendVideo;
+    private Context mContext;
+
+    private int flashMode = CameraPreview.FLASH_MODE_OFF;
+
     private LinearLayout cameraPreview;
+    private boolean recording;
+    private boolean previewing;
     private MediaPlayer mediaPlayer;
+    private MediaRecorder mediaRecorder;
+    private Button backCameraButton;
+    private Button sendVideo;
+    private Button switchCamera;
+    private Button flashButton;
+    private Button mainButton;
     private File outputFile;
-    private boolean recording = false;
-    private TextView timer;
     private long startTime = 0;
+    private ImageView focusCursor;
+    private EditText hashTags;
 
 
-
+    private TextView timer;
     private Handler timerHandler = new Handler();
+
+
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -59,14 +81,14 @@ public class VideoActivity extends Activity{
             timerHandler.postDelayed(this, 500);
         }
     };
-    private String TAG = VideoActivity.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_video);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        mContext = this;
         init();
     }
 
@@ -74,28 +96,51 @@ public class VideoActivity extends Activity{
     @Override
     protected void onResume() {
         super.onResume();
-        if(!CameraHelper.hasCamera(getApplicationContext())){
-            Toast.makeText(this, "Sorry, your phone does not have a camera!", Toast.LENGTH_LONG).show();
+        if (!CameraHelper.hasCamera(mContext)) {
+            Toast.makeText(mContext, "Sorry, your phone does not have a camera!", Toast.LENGTH_LONG).show();
             finish();
         }
-        if(mCamera == null){
-            if(CameraHelper.findFrontFacingCamera() < 0){
-                Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
-                switchCamera.setVisibility(View.GONE);
+        if(CameraHelper.isCameraUsedByOtherApp()){
+            hideAllPosition();
+            hashTags.setText("Can't access camera");
+        }else {
+            if (mCamera == null) {
+                if (!CameraHelper.hasFrontCamera()) {
+                    Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
+                    switchCamera.setVisibility(View.GONE);
+                }
+                if (cameraPreview == null || cameraPreview.getChildCount() == 0) {
+                    cameraPreview = (LinearLayout) findViewById(R.id.videoPreview);
+                    cameraPreview.addView(mPreview);
+                }
+                mCamera = Camera.open(CameraHelper.cameraId == -1 ? CameraHelper.findBackFacingCamera() : CameraHelper.cameraId);
+                mPreview.refreshCamera(mCamera);
             }
-            mCamera = Camera.open(CameraHelper.findBackFacingCamera());
-            mPreview = new CameraPreview(this, mCamera);
-            mPreview.refreshCamera(mCamera);
-            cameraPreview.addView(mPreview);
         }
     }
 
     private void init() {
-        cameraPreview = (LinearLayout) findViewById(R.id.videoPreview);
+        RelativeLayout screen = (RelativeLayout) findViewById(R.id.videoScreen);
+        screen.setOnTouchListener(touchFocusListener);
 
+        focusCursor = (ImageView) findViewById(R.id.cameraFocusCursor);
+
+        hashTags = (EditText) findViewById(R.id.videoHashTag);
+
+        cameraPreview = (LinearLayout) findViewById(R.id.videoPreview);
+        mPreview = new CameraPreview(mContext, mCamera);
+        cameraPreview.addView(mPreview);
+
+        flashButton = (Button) findViewById(R.id.flashMode);
+        flashButton.setOnClickListener(flashModeListener);
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+            flashButton.setVisibility(View.GONE);
+        }
+        if (CameraHelper.cameraFront) flashButton.setVisibility(View.GONE);
         timer = (TextView) findViewById(R.id.recordTimer);
 
         mediaPlayer = new MediaPlayer();
+
 
         mainButton = (Button) findViewById(R.id.mainButton);
         mainButton.setOnClickListener(captureListener);
@@ -110,115 +155,127 @@ public class VideoActivity extends Activity{
         switchCamera.setOnClickListener(switchCameraListener);
     }
 
-    View.OnClickListener sendVideoListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent();
-            intent.putExtra("File", AppConfig.LastFilePathCreated);
-            setResult(RESULT_OK, intent);
-            finish();
-        }
-    };
+    private void resetPosition(){
+        previewing = false;
+        sendVideo.setVisibility(View.GONE);
+        switchCamera.setVisibility(View.VISIBLE);
+        backCameraButton.setVisibility(View.GONE);
+        timer.setText("");
+        hashTags.setVisibility(View.GONE);
+        if(CameraHelper.cameraFront)
+            flashButton.setVisibility(View.GONE);
+        else
+            flashButton.setVisibility(View.VISIBLE);
+    }
 
-    View.OnClickListener backButtonListener = new View.OnClickListener() {
+    private void hideAllPosition(){
+        mainButton.setVisibility(View.GONE);
+        sendVideo.setVisibility(View.GONE);
+        switchCamera.setVisibility(View.GONE);
+        backCameraButton.setVisibility(View.GONE);
+        flashButton.setVisibility(View.GONE);
+        hashTags.setVisibility(View.VISIBLE);
+    }
+
+    private void recordingPosition(){
+        sendVideo.setVisibility(View.GONE);
+        switchCamera.setVisibility(View.GONE);
+        backCameraButton.setVisibility(View.GONE);
+        flashButton.setVisibility(View.GONE);
+        hashTags.setVisibility(View.GONE);
+    }
+    private void previewPosition(){
+        sendVideo.setVisibility(View.VISIBLE);
+        switchCamera.setVisibility(View.GONE);
+        backCameraButton.setVisibility(View.VISIBLE);
+        flashButton.setVisibility(View.GONE);
+        hashTags.setVisibility(View.VISIBLE);
+    }
+
+    View.OnTouchListener touchFocusListener = new View.OnTouchListener() {
         @Override
-        public void onClick(View v) {
-            File vid = new File(AppConfig.LastFilePathCreated);
-            if(vid.exists()){
-                if(!vid.delete()){
-                    Log.d(TAG, "Couldn't delete file");
+        public boolean onTouch(View v, MotionEvent event) {
+            if(previewing){
+                InputMethodManager imm = (InputMethodManager)getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(hashTags.getWindowToken(), 0);
+            }
+            if (!CameraHelper.cameraFront) {
+                if(!recording && !previewing) {
+                    mPreview.focus(event, focusCursor);
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            focusCursor.setVisibility(View.VISIBLE);
+                            RelativeLayout.LayoutParams mParams = (RelativeLayout.LayoutParams) focusCursor.getLayoutParams();
+                            int x = (int) event.getRawX();
+                            int y = (int) event.getRawY();
+                            mParams.leftMargin = x - (focusCursor.getWidth() / 2);
+                            mParams.topMargin = y - focusCursor.getHeight();
+                            focusCursor.setLayoutParams(mParams);
+
+
+                            final Animation animation = new AlphaAnimation(1, 0);
+                            animation.setDuration(1200);
+                            animation.setInterpolator(new LinearInterpolator());
+                            animation.setRepeatMode(Animation.REVERSE);
+                            focusCursor.startAnimation(animation);
+
+                            break;
+                    }
                 }
             }
-            releaseCamera();
-            releaseMediaRecorder();
-            cameraPreview.removeView(mPreview);
-            chooseCamera();
-            mPreview = new CameraPreview(VideoActivity.this, mCamera);
-            mPreview.refreshCamera(mCamera);
-            cameraPreview.addView(mPreview);
+            return true;
         }
     };
 
-    View.OnClickListener switchCameraListener = new View.OnClickListener() {
+    View.OnClickListener flashModeListener = new View.OnClickListener() {
         @Override
-        public void onClick(View view) {
-            if(!recording){
-                int cameraNumbers = Camera.getNumberOfCameras();
-                if(cameraNumbers > 1){
-                    releaseCamera();
-                    chooseCamera();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Sorry, your phone has only one camera!", Toast.LENGTH_LONG).show();
-                }
+        public void onClick(View v) {
+            if (flashMode == CameraPreview.FLASH_MODE_OFF) {
+                mPreview.flashOn();
+                flashMode = CameraPreview.FLASH_MODE_ON;
+                flashButton.setText("ON");
+            } else if (flashMode == CameraPreview.FLASH_MODE_ON) {
+                mPreview.flashOff();
+                flashMode = CameraPreview.FLASH_MODE_OFF;
+                flashButton.setText("OFF");
             }
         }
     };
 
-    public void chooseCamera(){
-        if(CameraHelper.cameraFront){
-            int cameraId = CameraHelper.findBackFacingCamera();
-            if(cameraId >= 0){
-                mCamera = Camera.open(cameraId);
-                mPreview.refreshCamera(mCamera);
-            }
-        }else{
-            int cameraId = CameraHelper.findFrontFacingCamera();
-            if(cameraId >= 0){
-                mCamera = Camera.open(cameraId);
-                mPreview.refreshCamera(mCamera);
-            }
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        releaseCamera();
-        releaseMediaRecorder();
-        cameraPreview.removeView(mPreview);
-        timerHandler.removeCallbacks(timerRunnable);
-        mediaPlayer.release();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        releaseCamera();
-        releaseMediaRecorder();
-        timerHandler.removeCallbacks(timerRunnable);
-        mediaPlayer.release();
-    }
 
     View.OnClickListener captureListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if(recording){
+            if (recording) {
                 timerHandler.removeCallbacks(timerRunnable);
-                mPreview.mediaRecorder.stop();
+                mediaRecorder.stop();
                 releaseMediaRecorder();
                 recording = false;
                 CameraHelper.cameraFront = !CameraHelper.cameraFront;
                 releaseCamera();
+                previewPosition();
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            mediaPlayer.setDisplay(mPreview.getPrivateHolder());
+                            previewing = true;
+                            mediaPlayer.setDisplay(mPreview.getHolder());
                             mediaPlayer.setDataSource(AppConfig.LastFilePathCreated);
                             mediaPlayer.setLooping(true);
                             mediaPlayer.prepare();
                             mediaPlayer.start();
                             backCameraButton.setVisibility(View.VISIBLE);
                             sendVideo.setVisibility(View.VISIBLE);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 });
-            }else{
+            } else {
                 outputFile = AppConfig.getOutputMediaFile(getApplicationContext(), AppConfig.MEDIA_TYPE_VIDEO);
-                if(!prepareMediaRecorder()){
+                if (!prepareMediaRecorder()) {
                     Toast.makeText(getApplicationContext(), "Fail in prepareMediaRecorder()!\n - Ended -", Toast.LENGTH_LONG).show();
                     finish();
                 }
@@ -226,13 +283,14 @@ public class VideoActivity extends Activity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             AppConfig.LastFilePathCreated = outputFile.getPath();
-                            mPreview.mediaRecorder.start();
+                            mediaRecorder.start();
                             startTime = System.currentTimeMillis();
                             timerHandler.postDelayed(timerRunnable, 0);
                             recording = true;
-                        }catch (final Exception e){
+                            recordingPosition();
+                        } catch (final Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -241,18 +299,13 @@ public class VideoActivity extends Activity{
         }
     };
 
-    private void releaseMediaRecorder() {
-        mPreview.releaseMediaRecorder();
-    }
-
     private boolean prepareMediaRecorder() {
         try {
-            if(mCamera == null)
+            if (mCamera == null)
                 chooseCamera();
 
-            Camera.Parameters parameters = mCamera.getParameters();
-            List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            Camera.Size optimalSize = mSupportedPreviewSizes.get(0);
+            Display display = ((WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            Camera.Size optimalSize = mPreview.getPreviewSize();
 
             CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
             profile.videoFrameWidth = optimalSize.width;
@@ -262,6 +315,7 @@ public class VideoActivity extends Activity{
             profile.videoFrameRate = 30;
             profile.audioBitRate = 780000;
 
+            Camera.Parameters parameters = mCamera.getParameters();
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 parameters.setAutoExposureLock(false);
                 parameters.setAutoWhiteBalanceLock(false);
@@ -275,38 +329,67 @@ public class VideoActivity extends Activity{
             parameters.setExposureCompensation(4);
             parameters.setSceneMode("scene-mode=dusk-dawn");
 
-
-            parameters.setPreviewSize(profile.videoFrameWidth, profile.videoFrameHeight);
             mCamera.setParameters(parameters);
-            Display display = ((WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-            mPreview.mediaRecorder = new MediaRecorder();
+            mediaRecorder = new MediaRecorder();
 
             mCamera.unlock();
-            mPreview.mediaRecorder.setCamera(mCamera);
+            mediaRecorder.setCamera(mCamera);
 
-            mPreview.mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mPreview.mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
 
-            mPreview.mediaRecorder.setProfile(profile);
+            mediaRecorder.setProfile(profile);
+/*
+            Camera.Parameters parameters = mCamera.getParameters();
 
+            parameters.set("iso", "ISO800");
+            parameters.setColorEffect("none");
+            parameters.setPreviewFrameRate(30);
+            parameters.setExposureCompensation(4);
+            parameters.setSceneMode("scene-mode=dusk-dawn");
 
-            if(display.getRotation() == Surface.ROTATION_0){
-                if(!CameraHelper.cameraFront)
-                    mPreview.mediaRecorder.setOrientationHint(90);
-                else
-                    mPreview.mediaRecorder.setOrientationHint(270);
+            mCamera.setParameters(parameters);
+
+            mediaRecorder = new MediaRecorder();
+
+            mCamera.unlock();
+            mediaRecorder.setCamera(mCamera);
+
+            Camera.Size optimalSize = mPreview.getPreviewSize();
+
+            mediaRecorder.setVideoSource(0);
+            mediaRecorder.setAudioSource(0);
+            mediaRecorder.setOutputFormat(2);
+            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mediaRecorder.setVideoEncodingBitRate(1500000);
+            mediaRecorder.setVideoFrameRate(30);
+            mediaRecorder.setVideoSize(optimalSize.width, optimalSize.height);
+            mediaRecorder.setAudioChannels(2);
+            mediaRecorder.setAudioEncoder(3);
+            mediaRecorder.setAudioEncodingBitRate(780000);
+            mediaRecorder.setAudioSamplingRate(44100);
+            mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
+*/
+
+            if (display.getRotation() == Surface.ROTATION_0) {
+                if (!CameraHelper.cameraFront) {
+                    mediaRecorder.setOrientationHint(90);
+                } else {
+                    mediaRecorder.setOrientationHint(270);
+                }
             }
-            if(display.getRotation() == Surface.ROTATION_270){
-                if(!CameraHelper.cameraFront)
-                    mPreview.mediaRecorder.setOrientationHint(180);
-                else
-                    mPreview.mediaRecorder.setOrientationHint(0);
+            if (display.getRotation() == Surface.ROTATION_270) {
+                if (!CameraHelper.cameraFront) {
+                    mediaRecorder.setOrientationHint(180);
+                } else {
+                    mediaRecorder.setOrientationHint(0);
+                }
             }
-            mPreview.mediaRecorder.setOutputFile(outputFile.getAbsolutePath());
 
             try {
-                mPreview.mediaRecorder.prepare();
+                mediaRecorder.prepare();
             } catch (IllegalStateException e) {
                 Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
                 releaseMediaRecorder();
@@ -316,7 +399,7 @@ public class VideoActivity extends Activity{
                 releaseMediaRecorder();
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "Unknown Exception: " + e.getMessage());
             releaseMediaRecorder();
             return false;
@@ -324,12 +407,91 @@ public class VideoActivity extends Activity{
         return true;
     }
 
+    View.OnClickListener sendVideoListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent();
+            intent.putExtra("File", AppConfig.LastFilePathCreated);
+            intent.putExtra("HashTag", hashTags.getText());
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+    };
+    View.OnClickListener backButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            File vid = new File(AppConfig.LastFilePathCreated);
+            if (vid.exists()) {
+                if (!vid.delete()) {
+                    Log.d(TAG, "Couldn't delete file");
+                }
+            }
+            releaseCamera();
+            releaseMediaRecorder();
+            cameraPreview.removeView(mPreview);
+            chooseCamera();
+            mPreview = new CameraPreview(mContext, mCamera);
+            mPreview.refreshCamera(mCamera);
+            cameraPreview.addView(mPreview);
+            resetPosition();
+        }
+    };
+
+    private void releaseMediaRecorder() {
+        if (mediaRecorder != null) {
+            mediaRecorder.reset();
+            mediaRecorder.release();
+            mediaRecorder = null;
+        }
+    }
+
+    View.OnClickListener switchCameraListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (!recording) {
+                int cameraNumbers = Camera.getNumberOfCameras();
+                if (cameraNumbers > 1) {
+                    releaseCamera();
+                    chooseCamera();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Sorry, your phone has only one camera!", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
+
+    private void chooseCamera() {
+        if (!recording) {
+            int cameraId;
+            if (CameraHelper.cameraFront) {
+                cameraId = CameraHelper.findBackFacingCamera();
+                flashButton.setVisibility(View.VISIBLE);
+            } else {
+                cameraId = CameraHelper.findFrontFacingCamera();
+                flashButton.setVisibility(View.GONE);
+            }
+            if (cameraId >= 0) {
+                mCamera = Camera.open(cameraId);
+                mPreview.refreshCamera(mCamera);
+            }
+        }
+    }
+
     private void releaseCamera() {
-        if(mCamera != null){
+        if (mCamera != null) {
             mCamera.release();
             mCamera = null;
         }
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseCamera();
+        releaseMediaRecorder();
+        cameraPreview.removeView(mPreview);
+        timerHandler.removeCallbacks(timerRunnable);
+        mediaPlayer.release();
+        resetPosition();
+    }
 }
