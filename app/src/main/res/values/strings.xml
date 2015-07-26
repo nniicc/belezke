@@ -25,6 +25,20 @@
     <string name="dont_forget_your_hashtag">#don\'t forget your hash</string>
 
 
+    <string name="standard">Standard</string>
+    <string name="ffc">Front-Facing</string>
+    <string name="record">Record Video</string>
+    <string name="stop">Stop</string>
+    <string name="lock_to_landscape">Lock to Landscape</string>
+    <string name="launch_camera_app">Launch Camera App</string>
+    <string name="auto_focus">Auto-focus</string>
+    <string name="single_shot_mode">Single-Shot Mode</string>
+    <string name="no_image">There was no image to show!</string>
+    <string name="show_zoom">Show Zoom</string>
+    <string name="flash">Flash</string>
+    <string name="launch_full_screen">Launch Full-Screen</string>
+    <string name="mirror_ffc">Mirror FFC</string>
+
 
     <string name="imageDescription_note">Note Image</string>
     <string name="imageDescription_pic">Picture Image</string>
@@ -62,5 +76,9 @@
     <string name="take_picture">Take picture</string>
     <string name="title_activity_camera_activity_last">CameraActivityLast</string>
     <string name="camera_focus">Camera Focus</string>
+    <string name="title_activity_picture_activity_test">PictureActivityTest</string>
+    <string name="share_text">Share</string>
+    <string name="title_activity_picture_activity_reals">PictureActivityReals</string>
+    <string name="title_activity_easy_camera">EasyCameraActivity</string>
 
 </resources>

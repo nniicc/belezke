@@ -12,7 +12,9 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
 
     <application
         android:name=".Config.AppController"
@@ -66,6 +68,14 @@
         <activity
             android:name=".Activities.VideoActivity"
             android:label="@string/title_activity_camera_activity_last" >
+        </activity>
+        <activity
+            android:name="com.commonsware.cwac.cam2.CameraActivity"
+            android:process=":cwac_cam2"
+            android:theme="@style/PictureTheme" />
+        <activity
+            android:name=".Activities.PictureActivity"
+            android:label="@string/title_activity_easy_camera" >
         </activity>
     </application>
 

@@ -5,9 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.belzeke.notepad.Adapters.GridViewAdapter;
@@ -35,6 +38,8 @@ public class GridViewActivity extends AppCompatActivity {
     private boolean mediaShown = false;
     private Integer gridType;
     private static String TAG = GridViewActivity.class.getSimpleName();
+    private MenuItem shareItem;
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +63,27 @@ public class GridViewActivity extends AppCompatActivity {
             mGridView.setVisibility(View.VISIBLE);
             mVideoViw.setVisibility(View.GONE);
             mediaShown = !mediaShown;
+            shareItem.setVisible(false);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grid_view, menu);
+
+        shareItem = menu.findItem(R.id.menu_item_share);
+
+
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+
+        return true;
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.setHeaderTitle("Options");
-        menu.add(0, v.getId(), 0, "Get Postion");
+        menu.add(0, v.getId(), 0, "Share");
         menu.add(0, v.getId(), 0, "Show in browser");
         menu.add(0, v.getId(), 0, "Upload");
     }
@@ -76,8 +94,16 @@ public class GridViewActivity extends AppCompatActivity {
         GridViewAdapter adapter = (GridViewAdapter) mGridView.getAdapter();
         Note note = adapter.getItem(info.position);
         File noteFile = new File(note.getNoteName());
-        if (item.getTitle() == "Get Postion") {
-            Toast.makeText(getApplicationContext(), Integer.toString(info.position), Toast.LENGTH_LONG).show();
+        if (item.getTitle() == "Share") {
+            if (noteFile.exists() && note.isUploaded() && AppConfig.isNetworkAvailable(getApplicationContext())) {
+                String url = AppConfig.URLFiles + AppConfig.userId + File.separator + noteFile.getName();
+                if (!url.startsWith("http://") && !url.startsWith("https://"))
+                    url = "http://" + url;
+                Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, url);
+                startActivity(Intent.createChooser(intent, "Share via"));
+            }
         } else if (item.getTitle() == "Show in browser") {
             if (noteFile.exists() && note.isUploaded() && AppConfig.isNetworkAvailable(getApplicationContext())) {
                 String url = AppConfig.URLFiles + AppConfig.userId + File.separator + noteFile.getName();
@@ -132,15 +158,30 @@ public class GridViewActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (type == AppConfig.NOTE_VIDEO_TYPE) {
-                    String file = adapter.getItem(position).getNoteName();
+                    Note file = adapter.getItem(position);
                     mGridView.setVisibility(View.GONE);
                     mVideoViw.setVisibility(View.VISIBLE);
 
                     MediaController mediaController = new MediaController(GridViewActivity.this);
                     mVideoViw.setMediaController(mediaController);
-                    mVideoViw.setVideoPath(file);
+                    mVideoViw.setVideoPath(file.getNoteName());
                     mVideoViw.start();
                     mediaShown = true;
+                    shareItem.setVisible(true);
+                    if (mShareActionProvider != null && AppConfig.isNetworkAvailable(getApplicationContext())) {
+                        String noteFile = new File(file.getNoteName()).getName();
+                        int pos = noteFile.lastIndexOf('.');
+                        if(pos > 0){
+                            noteFile = noteFile.substring(0, pos);
+                        }
+                        String url = AppConfig.URLFiles + AppConfig.userId + File.separator + AppConfig.URLVideoView + noteFile;
+                        if (!url.startsWith("http://") && !url.startsWith("https://"))
+                            url = "http://" + url;
+                        Intent shareIntent = ShareCompat.IntentBuilder.from(GridViewActivity.this)
+                                .setType("text/plain").setText(url).getIntent();
+
+                        mShareActionProvider.setShareIntent(shareIntent);
+                    }
 
                 } else if (type == AppConfig.NOTE_PICTURE_TYPE) {
                     Intent intent = new Intent(GridViewActivity.this, ImageViewerActivity.class);
@@ -148,6 +189,7 @@ public class GridViewActivity extends AppCompatActivity {
                     intent.putExtra("position", position);
                     startActivity(intent);
                 }
+
             }
         });
     }

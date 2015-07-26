@@ -148,7 +148,7 @@ public class PostImageAsyncTask extends AsyncTask<Bitmap, Integer, String> {
                     if(temp.createNewFile()){
                         tempFilePath = temp.getAbsolutePath();
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        image.compress(Bitmap.CompressFormat.JPEG, 10, bos);
+                        image.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                         byte[] bitmapData = bos.toByteArray();
 
                         FileOutputStream fos = new FileOutputStream(temp);

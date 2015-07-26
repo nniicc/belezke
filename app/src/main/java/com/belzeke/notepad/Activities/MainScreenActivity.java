@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.belzeke.notepad.Asyncs.PostAudioAsyncTask;
+import com.belzeke.notepad.Asyncs.PostImageAsyncTask;
 import com.belzeke.notepad.Asyncs.PostVideoAsyncTask;
 import com.belzeke.notepad.Config.AppConfig;
 import com.belzeke.notepad.Helper.ProfileNavigationDrawerFragment;
@@ -192,10 +195,6 @@ public class MainScreenActivity extends AppCompatActivity {
 
             File pic = new File(AppConfig.LastFilePathCreated);
             if(pic.exists()){
-                Intent intent = new Intent(MainScreenActivity.this, HashTagNoteActivity.class);
-                intent.putExtra(AppConfig.NoteType, AppConfig.NOTE_PICTURE_TYPE);
-                startActivity(intent);
-                /*
                 long noteId = db.addNote(AppConfig.NOTE_PICTURE_TYPE, pic.getAbsolutePath(), "");
 
                 if(AppConfig.isNetworkAvailable(getApplicationContext())) {
@@ -203,7 +202,7 @@ public class MainScreenActivity extends AppCompatActivity {
 
                     PostImageAsyncTask task = new PostImageAsyncTask(this, photoProgress, db, noteId);
                     AppConfig.executeTask(task, photo);
-                }*/
+                }
             }
 
         }

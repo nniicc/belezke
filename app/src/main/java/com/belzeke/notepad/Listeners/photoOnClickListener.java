@@ -2,13 +2,10 @@ package com.belzeke.notepad.Listeners;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.view.View;
 
+import com.belzeke.notepad.Activities.PictureActivity;
 import com.belzeke.notepad.Config.AppConfig;
-
-import java.io.File;
 
 /**
  * Created by marko on 11.4.2015.
@@ -24,13 +21,17 @@ public class photoOnClickListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if(!AppConfig.NavigationShown) {
+/*
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             File savePath = AppConfig.getOutputMediaFile(activity, AppConfig.MEDIA_TYPE_IMAGE);
             if (savePath != null) {
                 AppConfig.LastFilePathCreated = savePath.getAbsolutePath();
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(savePath));
                 activity.startActivityForResult(intent, AppConfig.CAMERA_REQUEST);
-            }
+            }*/
+
+            Intent intent = new Intent(activity, PictureActivity.class);
+            activity.startActivityForResult(intent, AppConfig.CAMERA_REQUEST);
         }
 
         //ARCHIVE

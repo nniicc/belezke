@@ -32,12 +32,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public static final int FLASH_MODE_OFF = 0;
     public static final int FLASH_MODE_ON = 1;
 
+
     public Camera.Size getPreviewSize() {
         return mPreviewSize;
     }
 
     Camera.Size mPreviewSize;
     List<Camera.Size> mSupportedPreviewSizes;
+
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -71,6 +73,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             e.printStackTrace();
         }
     }
+
 
     public void refreshCamera(Camera camera) {
         if (mHolder.getSurface() == null) return;
@@ -106,21 +109,26 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private void setCameraParams() {
         Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Camera.Parameters parameters = mCamera.getParameters();
         if (display.getRotation() == Surface.ROTATION_0) {
             if (!CameraHelper.cameraFront) {
+                parameters.setRotation(90);
                 mCamera.setDisplayOrientation(90);
             } else {
+                parameters.setRotation(270);
                 mCamera.setDisplayOrientation(90);
             }
         }
         if (display.getRotation() == Surface.ROTATION_270) {
             if (!CameraHelper.cameraFront) {
+                parameters.setRotation(90);
                 mCamera.setDisplayOrientation(180);
             } else {
+                parameters.setRotation(90);
                 mCamera.setDisplayOrientation(0);
             }
         }
-        Camera.Parameters parameters = mCamera.getParameters();
+
 
 
         parameters.set("iso", "ISO800");
@@ -203,7 +211,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void focus(MotionEvent event, final ImageView focusCursor) {
         if (mCamera != null) {
             mCamera.cancelAutoFocus();
-            Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f);
+            Rect focusRect = calculateTapArea(event.getX(), event.getY());
 
             Camera.Parameters parameters = mCamera.getParameters();
             if (!parameters.getFocusMode().equals(Camera.Parameters.FOCUS_MODE_AUTO)) {
@@ -240,7 +248,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    private Rect calculateTapArea(float x, float y, float v) {
+    private Rect calculateTapArea(float x, float y) {
         int left = clamp(Float.valueOf((x / this.getWidth()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
         int top = clamp(Float.valueOf((y / this.getHeight()) * 2000 - 1000).intValue(), FOCUS_AREA_SIZE);
 

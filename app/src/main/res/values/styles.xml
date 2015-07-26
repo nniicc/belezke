@@ -8,6 +8,14 @@
         <item name="colorAccent">@color/accentColor</item>
     </style>
 
+    <style name="PictureTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+
+    </style>
+
+    <style name="CameraTheme" parent="Theme.AppCompat">
+
+    </style>
+
     <style name="MainScreenTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="app_bar_color">@color/mainScreenColor</item>
         <item name="colorPrimaryDark">@color/mainScreenColorDark</item>

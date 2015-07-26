@@ -30,12 +30,13 @@ import java.util.Locale;
  */
 public final class AppConfig {
     public static Integer userId = -1;
-    public static boolean TakingNotes = true;
     public static boolean NavigationShown = false;
     public static SQLiteHandler db;
 
+
     public static final String URLBase = "http://bazeni-nniicc.rhcloud.com/Belezka/";
     public static final String URLFiles = URLBase + "uploads/";
+    public static final String URLVideoView = "video.php?id=";
     public static final String URLPostFile = URLBase + "saveVideo.php";
     public static final String URLogin = URLBase + "login.php";
     public static final String URLRegister = URLBase + "register.php";
